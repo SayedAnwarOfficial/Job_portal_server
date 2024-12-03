@@ -136,6 +136,7 @@ This API allows for the management of job postings, including creating new jobs,
 ---
 
 ## Table of Contents
+
 1. [Features](#features)
 2. [Schema: Job](#schema-job)
 3. [Endpoints](#endpoints)
@@ -148,7 +149,9 @@ This API allows for the management of job postings, including creating new jobs,
 ---
 
 ## Features
+
 - **Admin Features**:
+
   - Create new job postings.
   - Retrieve jobs created by the admin.
 
@@ -163,34 +166,38 @@ This API allows for the management of job postings, including creating new jobs,
 The `Job` schema represents the structure of a job document in the database.
 
 ### Fields
-| Field            | Type         | Required | Description                                      |
-|------------------|--------------|----------|--------------------------------------------------|
-| `title`          | String       | Yes      | Title of the job.                               |
-| `description`    | String       | Yes      | Description of the job.                         |
-| `requirements`   | Array[String]| Yes      | List of requirements for the job.               |
-| `salary`         | Number       | Yes      | Salary offered for the job.                     |
-| `experienceLevel`| Number       | Yes      | Experience level required for the job.          |
-| `location`       | String       | Yes      | Location of the job.                            |
-| `jobType`        | String       | Yes      | Type of job (e.g., full-time, part-time).       |
-| `position`       | Number       | Yes      | Number of positions available.                  |
-| `company`        | ObjectId     | Yes      | Reference to the associated company.            |
-| `created_by`     | ObjectId     | Yes      | Reference to the admin who created the job.     |
-| `applications`   | Array[ObjectId]| No     | References to the job applications.             |
+
+| Field             | Type            | Required | Description                                 |
+| ----------------- | --------------- | -------- | ------------------------------------------- |
+| `title`           | String          | Yes      | Title of the job.                           |
+| `description`     | String          | Yes      | Description of the job.                     |
+| `requirements`    | Array[String]   | Yes      | List of requirements for the job.           |
+| `salary`          | Number          | Yes      | Salary offered for the job.                 |
+| `experienceLevel` | Number          | Yes      | Experience level required for the job.      |
+| `location`        | String          | Yes      | Location of the job.                        |
+| `jobType`         | String          | Yes      | Type of job (e.g., full-time, part-time).   |
+| `position`        | Number          | Yes      | Number of positions available.              |
+| `company`         | ObjectId        | Yes      | Reference to the associated company.        |
+| `created_by`      | ObjectId        | Yes      | Reference to the admin who created the job. |
+| `applications`    | Array[ObjectId] | No       | References to the job applications.         |
 
 ---
 
 ## Endpoints
 
 ### Post a Job
+
 - **URL:** `/postjob`
 - **Method:** `POST`
 - **Description:** Admins can create a new job posting.
 
 #### Headers
+
 - **Required:** Authentication token
 
 #### Body
-```json
+
+````json
 {
   "title": "string",
   "description": "string",
@@ -202,3 +209,135 @@ The `Job` schema represents the structure of a job document in the database.
   "position": "number",
   "companyId": "string"
 }
+
+# Job Applications Management API
+
+This API handles job applications, enabling users to apply for jobs, view their applications, update application statuses, and manage applicants for specific jobs.
+
+## Table of Contents
+
+1. [Schema: Application](#schema-application)
+2. [Endpoints](#endpoints)
+   - [Apply for a Job](#apply-for-a-job)
+   - [Get Applied Jobs](#get-applied-jobs)
+   - [View Applicants for a Job](#view-applicants-for-a-job)
+   - [Update Application Status](#update-application-status)
+3. [Usage Instructions](#usage-instructions)
+
+---
+
+## Schema: Application
+
+The `Application` schema represents the structure of application documents in the database.
+
+### Fields
+
+| Field       | Type     | Required | Description                                           |
+|-------------|----------|----------|-------------------------------------------------------|
+| `job`       | ObjectId | Yes      | Reference to the `Job` document.                     |
+| `applicant` | ObjectId | Yes      | Reference to the `User` document representing the applicant. |
+| `status`    | String   | No       | Status of the application (`pending`, `accepted`, `rejected`). Defaults to `pending`. |
+| `createdAt` | Date     | Yes      | Timestamp of application creation (auto-generated).  |
+| `updatedAt` | Date     | Yes      | Timestamp of last update (auto-generated).           |
+
+---
+
+## Endpoints
+
+### Apply for a Job
+
+- **URL:** `/apply/:id`
+- **Method:** `GET`
+- **Description:** Allows a user to apply for a specific job.
+- **Authentication:** Requires `isAuthenticated` middleware.
+
+#### Headers
+
+- `Authorization`: JWT Token
+
+#### Parameters
+
+| Parameter | Type   | Required | Description         |
+|-----------|--------|----------|---------------------|
+| `id`      | String | Yes      | ID of the job to apply for. |
+
+#### Response
+
+| Status Code | Description                             |
+|-------------|-----------------------------------------|
+| `201`       | Job application created successfully.  |
+| `400`       | Missing or invalid job ID, or already applied. |
+| `404`       | Job not found.                         |
+
+---
+
+### Get Applied Jobs
+
+- **URL:** `/appliedJobs`
+- **Method:** `GET`
+- **Description:** Retrieves the list of jobs the authenticated user has applied for.
+- **Authentication:** Requires `isAuthenticated` middleware.
+
+#### Headers
+
+- `Authorization`: JWT Token
+
+#### Response
+
+| Status Code | Description                           |
+|-------------|---------------------------------------|
+| `200`       | Successfully fetched applied jobs.   |
+| `404`       | No applications found.               |
+
+---
+
+### View Applicants for a Job
+
+- **URL:** `/:id/applicants`
+- **Method:** `GET`
+- **Description:** Retrieves the list of applicants for a specific job (Admin only).
+- **Authentication:** Requires `isAuthenticated` middleware.
+
+#### Headers
+
+- `Authorization`: JWT Token
+
+#### Parameters
+
+| Parameter | Type   | Required | Description         |
+|-----------|--------|----------|---------------------|
+| `id`      | String | Yes      | ID of the job.      |
+
+#### Response
+
+| Status Code | Description                           |
+|-------------|---------------------------------------|
+| `200`       | Successfully fetched applicants.     |
+| `404`       | Job not found.                       |
+
+---
+
+### Update Application Status
+
+- **URL:** `/status/:id/update`
+- **Method:** `POST`
+- **Description:** Updates the status of a specific application.
+- **Authentication:** Requires `isAuthenticated` middleware.
+
+#### Headers
+
+- `Authorization`: JWT Token
+
+#### Parameters
+
+| Parameter | Type   | Required | Description                     |
+|-----------|--------|----------|---------------------------------|
+| `id`      | String | Yes      | ID of the application to update. |
+
+#### Body
+
+```json
+{
+  "status": "string (pending | accepted | rejected)"
+}
+````

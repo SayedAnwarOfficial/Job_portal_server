@@ -60,6 +60,7 @@ None
   "role": "string (student | recruiter)"
 }
 ```
+<<<<<<< HEAD
 
 # Company Management API
 
@@ -128,3 +129,5 @@ The `Company` schema represents the structure of a company document in the datab
   "location": "string"
 }
 ```
+=======
+>>>>>>> 1b2c90aec8b338bdf05aa7ac2a745d596e589760

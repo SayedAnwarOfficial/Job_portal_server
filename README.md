@@ -61,8 +61,3 @@ None
   "role": "string (student | recruiter)"
 }
 ```
-
-Configure environment variables (SECRET_KEY, CLOUDINARY_URL, etc.).
-Start the server using npm start or nodemon.
-Use a tool like Postman to interact with the endpoints.
->>>>>>> 46843c3d1ad04ae01f0dfcd0123f572cc022461c

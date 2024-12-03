@@ -10,7 +10,7 @@ export const postJob = async (req, res) => {
       salary,
       location,
       jobType,
-      experience,
+      experienceLevel,
       position,
       companyId,
     } = req.body;
@@ -19,11 +19,11 @@ export const postJob = async (req, res) => {
     if (
       !title ||
       !description ||
-      !requirements ||
+      !requirements?.length ||
       !salary ||
       !location ||
       !jobType ||
-      !experience ||
+      !experienceLevel ||
       !position ||
       !companyId
     ) {
@@ -32,25 +32,28 @@ export const postJob = async (req, res) => {
         success: false,
       });
     }
+
     const job = await Job.create({
       title,
       description,
-      requirements: requirements.split(","),
+      requirements,
       salary: Number(salary),
       location,
       jobType,
-      experienceLevel: experience,
+      experienceLevel,
       position,
       company: companyId,
       created_by: userId,
     });
+
     return res.status(201).json({
       message: "New job created successfully.",
       job,
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error creating job:", error);
+    res.status(500).json({ message: "Internal Server Error", success: false });
   }
 };
 

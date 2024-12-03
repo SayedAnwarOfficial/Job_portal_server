@@ -60,7 +60,6 @@ None
   "role": "string (student | recruiter)"
 }
 ```
-<<<<<<< HEAD
 
 # Company Management API
 
@@ -129,5 +128,77 @@ The `Company` schema represents the structure of a company document in the datab
   "location": "string"
 }
 ```
-=======
->>>>>>> 1b2c90aec8b338bdf05aa7ac2a745d596e589760
+
+# Job Management API
+
+This API allows for the management of job postings, including creating new jobs, retrieving job listings, and fetching job details. It also supports admin-specific functionality for managing jobs they have created.
+
+---
+
+## Table of Contents
+1. [Features](#features)
+2. [Schema: Job](#schema-job)
+3. [Endpoints](#endpoints)
+   - [Post a Job](#post-a-job)
+   - [Get All Jobs](#get-all-jobs)
+   - [Get Job By ID](#get-job-by-id)
+   - [Get Admin Jobs](#get-admin-jobs)
+4. [Usage Instructions](#usage-instructions)
+
+---
+
+## Features
+- **Admin Features**:
+  - Create new job postings.
+  - Retrieve jobs created by the admin.
+
+- **General Features**:
+  - Search and retrieve all job postings.
+  - Fetch details of a specific job.
+
+---
+
+## Schema: Job
+
+The `Job` schema represents the structure of a job document in the database.
+
+### Fields
+| Field            | Type         | Required | Description                                      |
+|------------------|--------------|----------|--------------------------------------------------|
+| `title`          | String       | Yes      | Title of the job.                               |
+| `description`    | String       | Yes      | Description of the job.                         |
+| `requirements`   | Array[String]| Yes      | List of requirements for the job.               |
+| `salary`         | Number       | Yes      | Salary offered for the job.                     |
+| `experienceLevel`| Number       | Yes      | Experience level required for the job.          |
+| `location`       | String       | Yes      | Location of the job.                            |
+| `jobType`        | String       | Yes      | Type of job (e.g., full-time, part-time).       |
+| `position`       | Number       | Yes      | Number of positions available.                  |
+| `company`        | ObjectId     | Yes      | Reference to the associated company.            |
+| `created_by`     | ObjectId     | Yes      | Reference to the admin who created the job.     |
+| `applications`   | Array[ObjectId]| No     | References to the job applications.             |
+
+---
+
+## Endpoints
+
+### Post a Job
+- **URL:** `/postjob`
+- **Method:** `POST`
+- **Description:** Admins can create a new job posting.
+
+#### Headers
+- **Required:** Authentication token
+
+#### Body
+```json
+{
+  "title": "string",
+  "description": "string",
+  "requirements": ["string", "string"],
+  "salary": "number",
+  "location": "string",
+  "jobType": "string",
+  "experienceLevel": "number",
+  "position": "number",
+  "companyId": "string"
+}

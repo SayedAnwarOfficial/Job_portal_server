@@ -13,6 +13,21 @@ export const applyJob = async (req, res) => {
         success: false,
       });
     }
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({
+        message: "Job not found.",
+        success: false,
+      });
+    }
+
+    if (job.created_by.toString() === userId) {
+      return res.status(400).json({
+        message:
+          "You are not eligible to apply for this job as you are the creator.",
+        success: false,
+      });
+    }
 
     const existingApplication = await Application.findOne({
       job: jobId,
@@ -26,14 +41,7 @@ export const applyJob = async (req, res) => {
       });
     }
 
-    const job = await Job.findById(jobId);
-    if (!job) {
-      return res.status(404).json({
-        message: "Job not found.",
-        success: false,
-      });
-    }
-
+    // Create a new application
     const newApplication = await Application.create({
       job: jobId,
       applicant: userId,
@@ -47,10 +55,10 @@ export const applyJob = async (req, res) => {
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Error applying for job:", error);
+    res.status(500).json({ message: "Internal Server Error", success: false });
   }
 };
-
 // Get the jobs applied by the authenticated user
 export const getAppliedJobs = async (req, res) => {
   try {

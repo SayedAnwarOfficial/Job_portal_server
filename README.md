@@ -247,7 +247,7 @@ The `Application` schema represents the structure of application documents in th
 ### Apply for a Job
 
 - **URL:** `/apply/:id`
-- **Method:** `GET`
+- **Method:** `POST`
 - **Description:** Allows a user to apply for a specific job.
 - **Authentication:** Requires `isAuthenticated` middleware.
 
@@ -338,6 +338,6 @@ The `Application` schema represents the structure of application documents in th
 
 ```json
 {
-  "status": "string (pending | accepted | rejected)"
+  "status": "pending | accepted | rejected"
 }
 ````

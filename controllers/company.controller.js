@@ -108,17 +108,10 @@ export const getCompanyById = async (req, res) => {
 export const updateCompany = async (req, res) => {
   try {
     const { name, description, website, location } = req.body;
-    const file = req.file;
 
-    const fileUri = getDataUri(file);
-    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-    const logo = cloudResponse.secure_url;
-
-    const updateData = { name, description, website, location, logo };
-
-    const company = await Company.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
-    });
+    // Fetch company by ID
+    const companyId = req.params.id;
+    let company = await Company.findById(companyId);
 
     if (!company) {
       return res.status(404).json({
@@ -127,11 +120,46 @@ export const updateCompany = async (req, res) => {
       });
     }
 
+    // Handle file upload for logo
+    let uploadedLogo = req.files?.logo?.[0];
+    if (uploadedLogo) {
+      const fileUri = getDataUri(uploadedLogo);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      company.logo = cloudResponse.secure_url;
+    }
+
+    // Dynamically update fields
+    const updates = { name, description, website, location };
+
+    for (const [key, value] of Object.entries(updates)) {
+      if (value !== undefined) {
+        company[key] = value;
+      }
+    }
+
+    await company.save();
+
+    const updatedCompany = {
+      _id: company._id,
+      name: company.name,
+      description: company.description,
+      website: company.website,
+      location: company.location,
+      logo: company.logo,
+      userId: company.userId,
+    };
+
     return res.status(200).json({
-      message: "Company information updated.",
+      message: "Company information updated successfully.",
+      company: updatedCompany,
       success: true,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    return res.status(500).json({
+      message: "An error occurred while updating the company.",
+      error: error.message,
+      success: false,
+    });
   }
 };
